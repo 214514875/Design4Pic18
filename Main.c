@@ -32,7 +32,7 @@
 
 // CONFIG3H
 #pragma config HFOFST = ON      // HFINTOSC Fast Start-up bit (HFINTOSC starts clocking the CPU without waiting for the oscillator to stablize.)
-#pragma config MCLRE = ON       // MCLR Pin Enable bit (MCLR pin enabled; RA3 input pin disabled)
+#pragma config MCLRE = OFF       // MCLR Pin Enable bit (MCLR pin enabled; RA3 input pin disabled)
 
 // CONFIG4L
 #pragma config STVREN = ON      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will cause Reset)
@@ -81,37 +81,36 @@
 
 void Init() {
     /*Oscillator setup*/
-    IRCF2 = 0x01; 
+    IRCF2 = 0x01;
     IRCF1 = 0x00;
     IRCF0 = 0x01;
 
     /*Disabling analogue inputs and comparators*/
     ANSEL = 0x00;
     ANSELH = 0x00;
-    
+
     /*Disabling comparators*/
     C1ON = 0;
     C2ON = 0;
-    
+
     /*EUSART Configuration*/
     TXEN = 1;
-    SYNC = 0;//0
+    SYNC = 0; //0
     SPEN = 1;
     CREN = 1;
     /*Baud rate of ~115200*/
-    BRGH = 1;//1
-    BRG16 = 1;//1
+    BRGH = 1; //1
+    BRG16 = 1; //1
     SPBRGH = 0; //Baud Rate of ~ 9600
     SPBRG = 8;
     //CKTXP = 1;
-    
+
     /*I/O configurations*/
     TRISC = 0x00; //Configure for output
     TRISB = 0x10; //All But RB4 set as output for Port B
     TRISB5 = 1; //Set as input
     TRISB7 = 0; //Set as output
-    
-    
+
 }//End init()
 
 void main(void) {
@@ -120,27 +119,64 @@ void main(void) {
     /*Initialize the LCD Screen*/
     Lcd_Init();
     Lcd_Clear();
-    __delay_ms(150);
-    
+
+    /*Four second delay waiting for the ESP8266 to start*/
+    __delay_ms(4000);
+
     /*Communicating with the ESP8266*/
-    
+
     /*Checking startup*/
-    __delay_ms(50);
+    __delay_ms(200);
     UART_Write_Text("AT\r\n");
     newCheck();
-    
+
     /*Disable Echo*/
-    __delay_ms(50);
+    __delay_ms(200);
     UART_Write_Text("ATE0\r\n");
     newCheck();
-    
+
     /*Enable Client mode only*/
-    __delay_ms(50);
+    __delay_ms(200);
     UART_Write_Text("AT+CWMODE=1\r\n");
     newCheck();
-    
-    /**/
-    
+
+    /*Enable Multiple Connections*/
+    __delay_ms(200);
+    UART_Write_Text("AT+CIPMUX=1\r\n");
+    newCheck();
+
+    /*Connecting to the router*/
+    UART_Write_Text("AT+CWJAP=\"NOKIA 909_0136\",\"4904aA!!\"\r\n");
+    newCheck();
+    __delay_ms(15000);
+
+
+    /*Create a connection*/
+    UART_Write_Text("AT+CIPSTART=3,\"TCP\",\"192.168.137.188\",4000\r\n");
+    newCheck();
+    __delay_ms(1000);
+
+    while(1){
+    __delay_ms(4000); 
+    LC7 = 1;
+    __delay_ms(4000);
+    LC7 = 0;
+        
+    /*Specify number of bits to send*/
+    UART_Write_Text("AT+CIPSEND=3,10\r\n");
+    waitToSend();
+    __delay_ms(200);
+
+    /*Send data*/
+    UART_Write_Text("111111\r\n");
+    __delay_ms(200);
+
+    }
+    /*Close connection*/
+    UART_Write_Text("AT+CIPCLOSE=3\r\n");
+    newCheck();
+
+
     while (1) {
 
     }//End infinite while loop
