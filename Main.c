@@ -124,7 +124,7 @@ void main(void) {
     __delay_ms(4000);
 
     /*Communicating with the ESP8266*/
-
+       
     /*Checking startup*/
     __delay_ms(200);
     UART_Write_Text("AT\r\n");
@@ -142,39 +142,41 @@ void main(void) {
 
     /*Enable Multiple Connections*/
     __delay_ms(200);
-    UART_Write_Text("AT+CIPMUX=1\r\n");
+    UART_Write_Text("AT+CIPMUX=0\r\n");
     newCheck();
 
+    /*Set transmission to unvarnished transmission mode*/
+    __delay_ms(4000);
+    UART_Write_Text("AT+CIPMODE=1\r\n");
+    newCheck();
+    
     /*Connecting to the router*/
-    UART_Write_Text("AT+CWJAP=\"NOKIA 909_0136\",\"4904aA!!\"\r\n");
+    UART_Write_Text("AT+CWJAP=\"Timmy\",\"96027313\"\r\n");
     newCheck();
     __delay_ms(15000);
 
-
     /*Create a connection*/
-    UART_Write_Text("AT+CIPSTART=3,\"TCP\",\"192.168.137.188\",4000\r\n");
+    UART_Write_Text("AT+CIPSTART=\"TCP\",\"192.168.1.74\",4000\r\n");
     newCheck();
     __delay_ms(1000);
 
-    while(1){
-    __delay_ms(4000); 
-    LC7 = 1;
-    __delay_ms(4000);
-    LC7 = 0;
-        
-    /*Specify number of bits to send*/
-    UART_Write_Text("AT+CIPSEND=3,10\r\n");
+    /*Start the data sending*/
+    UART_Write_Text("AT+CIPSEND\r\n");
     waitToSend();
-    __delay_ms(200);
+    
+    
 
-    /*Send data*/
-    UART_Write_Text("111111\r\n");
-    __delay_ms(200);
-
+    /*Send data in loop*/
+    while(1)
+    {
+        UART_Write_Text("Dens\0");
+        __delay_ms(1000);
     }
+    UART_Write_Text("1117771111111\r\n");
+
     /*Close connection*/
-    UART_Write_Text("AT+CIPCLOSE=3\r\n");
-    newCheck();
+    //UART_Write_Text("AT+CIPCLOSE\r\n");
+    //newCheck();
 
 
     while (1) {
