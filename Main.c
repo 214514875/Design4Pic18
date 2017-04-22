@@ -134,104 +134,48 @@ void main(void) {
     __delay_ms(200);
     UART_Write_Text("AT+RST\r\n");
     newCheck();
-
     __delay_ms(4000);
 
     /*Disable Echo*/
     __delay_ms(200);
     UART_Write_Text("ATE0\r\n");
     newCheck();
-
-    /*Enable Client mode only*/
+    
+     /*Enable Multiple Connections*/
+    UART_Write_Text("AT+CIPMUX=1\r\n");
+    newCheck();
+    __delay_ms(1000);
+     
+    /*Enable Client and Station*/
     __delay_ms(200);
     UART_Write_Text("AT+CWMODE=3\r\n");
     newCheck();
-
-    /*Enable Multiple Connections*/
+    __delay_ms(2000);
+    
     __delay_ms(200);
-    UART_Write_Text("AT+CIPMUX=0\r\n");
+    UART_Write_Text("AT+CIPSTA=\"192.168.4.40\"\r\n");
     newCheck();
+    __delay_ms(2000);
+    
+    UART_Write_Text("AT+CIPSERVER=1,1000\r\n");
+    newCheck();
+    __delay_ms(2000);
+    
 
     /*Set transmission to normal transmission mode*/
-    __delay_ms(4000);
-    UART_Write_Text("AT+CIPMODE=0\r\n");
+    /*UART_Write_Text("AT+CIPMODE=0\r\n");
     newCheck();
-
-    /*Connecting to the router*/
-    UART_Write_Text("AT+CWJAP=\"NOKIA 909_0136\",\"4904aA!!\"\r\n");
-    //UART_Write_Text("AT+CWJAP=\"HUAWEI P8 lite\",\"12345678\"\r\n");
-    newCheck();
-    __delay_ms(15000);
-
-    char str [50];
-    int x;
-    while (1) {
-        /*Create a connection*/
-        Lcd_Clear();
-        Lcd_Set_Cursor(1, 1);
-        UART_Write_Text("AT+CIPSTART=\"TCP\",\"192.168.137.188\",3000\r\n");
-        //UART_Write_Text("AT+CIPSTART=\"TCP\",\"192.168.43.84\",3000\r\n");
-        x = newCheckTimeout();
-
-        if (x == 0) {
-            break;
-        }
-
-        /*Start the data sending*/
-        UART_Write_Text("AT+CIPSEND=8\r\n");
-        waitToSend();
-        __delay_ms(100);
-
-
-        UART_Write_Text("Denver\r\n");
-        __delay_ms(1000);
-
-        UART_Write_Text("AT+CIPCLOSE\r\n");
-        __delay_ms(1000);
-    }
-
-    LC7 = 0x1;
-
+    __delay_ms(4000);*/
+    
     Lcd_Clear();
-    Lcd_Set_Cursor(1, 1);
-    UART_Write_Text("AT+CWQAP\r\n");
-    newCheck();
-    __delay_ms(1000);
-
-    /*Connecting to the router*/
-    UART_Write_Text("AT+CWJAP=\"NOKIA 909_0136\",\"4904aA!!\"\r\n");
-    //UART_Write_Text("AT+CWJAP=\"HUAWEI P8 lite\",\"12345678\"\r\n");
-    newCheck();
-    __delay_ms(15000);
-
-    while (1) {
-        /*Create a connection*/
+    Lcd_Set_Cursor(1,1);
+    char test [20];
+    while(1){
+        UART_Read_Text(&test,10);
+        Lcd_Write_String(test);
+        __delay_ms(2000);
         Lcd_Clear();
-        Lcd_Set_Cursor(1, 1);
-        //UART_Write_Text("AT+CIPSTART=\"TCP\",\"192.168.137.188\",3000\r\n");
-        //UART_Write_Text("AT+CIPSTART=\"TCP\",\"192.168.43.84\",3000\r\n");
-        /*IP Address for the ESP8266 Server*/
-        x = newCheckTimeout();
-
-        if (x == 0) {
-            break;
-        }
-
-        /*Start the data sending*/
-        UART_Write_Text("AT+CIPSEND=8\r\n");
-        waitToSend();
-        __delay_ms(100);
-
-        UART_Write_Text("Denver\r\n");
-        __delay_ms(1000);
-
-        UART_Write_Text("AT+CIPCLOSE\r\n");
-        __delay_ms(1000);
+        Lcd_Set_Cursor(1,1);
     }
-
-    UART_Write_Text("+++");
-    __delay_ms(100);
-
-
-
+     
 }//End main
