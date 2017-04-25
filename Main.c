@@ -152,10 +152,14 @@ void main(void) {
     newCheck();
     __delay_ms(2000);
     
-    __delay_ms(200);
+    UART_Write_Text("AT+CWSAP=\"Denver\",\"123456789\",4,2\r\n");
+    newCheck();
+    __delay_ms(1000);
+    
+    /*__delay_ms(200);
     UART_Write_Text("AT+CIPSTA=\"192.168.4.40\"\r\n");
     newCheck();
-    __delay_ms(2000);
+    __delay_ms(2000);*/
     
     UART_Write_Text("AT+CIPSERVER=1,1000\r\n");
     newCheck();
